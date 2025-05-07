@@ -308,12 +308,16 @@ function MainFeature() {
       const nextPlayer = players[nextPlayerIndex].id;
       
       
+      // Update current player
+      setCurrentPlayer(nextPlayer);
       // Get player name from the players array
       const nextPlayerName = players[nextPlayerIndex].name;
       toast.info(`${nextPlayerName}'s turn`, { autoClose: 1500 });
     } else {
       toast.success(`${playerInfo[currentPlayer].name} completed ${boxesCompleted} box${boxesCompleted > 1 ? 'es' : ''}!`, {
-        autoClose: 1500
+      // Find current player info
+      const currentPlayerInfo = players.find(player => player.id === currentPlayer);
+      toast.success(`${currentPlayerInfo.name} completed ${boxesCompleted} box${boxesCompleted > 1 ? 'es' : ''}!`, {
       });
       
       // Check if game is over (all possible boxes filled)
