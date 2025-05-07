@@ -16,7 +16,7 @@ function MainFeature() {
   const playerColors = [
     "primary", "secondary", "amber-500", "emerald-500", 
     "violet-500", "rose-500", "cyan-500", "lime-500"
-  });
+  ];
   const [currentPlayer, setCurrentPlayer] = useState('player1');
   
   // Game state
