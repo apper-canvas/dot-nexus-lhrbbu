@@ -160,7 +160,10 @@ function MainFeature() {
         const right = `${topRight}-${row1},${col2}`;
         
         if (lineExists(row1-1, col1, row1-1, col2) && 
-            lineExists(row1-1, col1, row1, col1) && 
+            lineExists(row1-1, col1, row1, col1) &&
+            lineExists(row1-1, col2, row1, col2)) {
+          const boxKey = `${row1-1},${col1}-${row1},${col2}`;
+          if (!boxes[boxKey]) {
             // Update boxes with the current player's ID
             setBoxes(prev => ({ 
               ...prev, 
@@ -172,9 +175,7 @@ function MainFeature() {
               if (player.id === currentPlayer)
                 return { ...player, score: player.score + 1 };
               return player;
-                ...prev[currentPlayer],
-                score: prev[currentPlayer].score + 1
-              }
+            }));
             }));
             boxesCompleted++;
           }
