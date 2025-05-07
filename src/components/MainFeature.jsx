@@ -314,9 +314,9 @@ function MainFeature() {
       const nextPlayerName = players[nextPlayerIndex].name;
       toast.info(`${nextPlayerName}'s turn`, { autoClose: 1500 });
     } else {
-      toast.success(`${playerInfo[currentPlayer].name} completed ${boxesCompleted} box${boxesCompleted > 1 ? 'es' : ''}!`, {
       const currentPlayerInfo = players.find(player => player.id === currentPlayer);
       toast.success(`${currentPlayerInfo.name} completed ${boxesCompleted} box${boxesCompleted > 1 ? 'es' : ''}!`, {
+        autoClose: 3000
       });
       
       // Check if game is over (all possible boxes filled)
