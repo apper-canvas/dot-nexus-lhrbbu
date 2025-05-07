@@ -334,7 +334,7 @@ function MainFeature() {
           winnerMessage = `${winners[0].name} wins!`;
         }
             
-        toast.success(`Game Over! ${winner === 'It\'s a tie' ? winner : `${winner} wins!`}`, {
+        toast.success(`Game Over! ${winnerMessage}`, {
           icon: "🏆",
           autoClose: false
         });
