@@ -356,17 +356,22 @@ function MainFeature() {
       for (let col = 0; col < gridSize - 1; col++) {
         const boxKey = `${row},${col}-${row+1},${col+1}`;
         const ownerClass = boxes[boxKey] ? `box-${boxes[boxKey]}` : '';
+        // Find the player who owns this box
+        const boxOwner = boxes[boxKey];
+        // Get the player's color if the box has an owner
+        const playerColor = boxOwner ? players.find(p => p.id === boxOwner)?.color : null;
+        // Apply background color with opacity
+        const style = {
+          top: `${(row * 100) / (gridSize - 1)}%`,
+          left: `${(col * 100) / (gridSize - 1)}%`,
+          width: `${100 / (gridSize - 1)}%`,
+          height: `${100 / (gridSize - 1)}%`,
+          backgroundColor: playerColor ? `var(--tw-color-${playerColor})` : 'transparent',
+          opacity: playerColor ? 0.3 : 0
+        };
         
         gridItems.push(
-          <div 
-            key={`box-${row}-${col}`}
-            className={`absolute transition-colors duration-300 ${ownerClass}`}
-            style={{
-              top: `${(row * 100) / (gridSize - 1)}%`,
-              left: `${(col * 100) / (gridSize - 1)}%`,
-              width: `${100 / (gridSize - 1)}%`,
-              height: `${100 / (gridSize - 1)}%`,
-            }}
+          <div key={`box-${row}-${col}`} className="absolute transition-colors duration-300" style={style}
           />
         );
       }

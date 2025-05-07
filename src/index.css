@@ -98,11 +98,4 @@
     @apply bg-secondary;
   }
 
-  .box-player1 {
-    @apply bg-primary bg-opacity-30 dark:bg-opacity-40;
-  }
-
-  .box-player2 {
-    @apply bg-secondary bg-opacity-30 dark:bg-opacity-40;
-  }
-}
+  
