@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { toast } from 'react-toastify';
 import getIcon from '../utils/iconUtils';
 
@@ -7,9 +7,15 @@ function MainFeature() {
   // Game configuration
   const [gridSize, setGridSize] = useState(4);
   const [gameStarted, setGameStarted] = useState(false);
-  const [playerInfo, setPlayerInfo] = useState({
-    player1: { name: "Player 1", score: 0, color: "primary" },
-    player2: { name: "Player 2", score: 0, color: "secondary" }
+  const [players, setPlayers] = useState([
+    { id: 'player1', name: "Player 1", score: 0, color: "primary" },
+    { id: 'player2', name: "Player 2", score: 0, color: "secondary" }
+  ]);
+  
+  // Available colors for players
+  const playerColors = [
+    "primary", "secondary", "amber-500", "emerald-500", 
+    "violet-500", "rose-500", "cyan-500", "lime-500"
   });
   const [currentPlayer, setCurrentPlayer] = useState('player1');
   
@@ -19,6 +25,7 @@ function MainFeature() {
   const [boxes, setBoxes] = useState({});
   
   const PlayIcon = getIcon('Play');
+  const TrashIcon = getIcon('Trash');
   const SettingsIcon = getIcon('Settings');
   const UserIcon = getIcon('User');
   const UserPlusIcon = getIcon('UserPlus');
@@ -44,10 +51,10 @@ function MainFeature() {
     setGrid(newGrid);
     setLines({});
     setBoxes({});
-    setPlayerInfo({
-      player1: { ...playerInfo.player1, score: 0 },
-      player2: { ...playerInfo.player2, score: 0 }
-    });
+    // Reset player scores
+    setPlayers(players.map(player => ({
+      ...player, score: 0
+    })));
     setCurrentPlayer('player1');
   };
   
@@ -86,6 +93,49 @@ function MainFeature() {
       toast.warning("Minimum grid size reached");
     }
   };
+
+  // Add a new player to the game
+  const addNewPlayer = () => {
+    if (players.length >= 8) {
+      toast.warning("Maximum 8 players allowed");
+      return;
+    }
+    
+    const newPlayerId = `player${players.length + 1}`;
+    const availableColors = playerColors.filter(
+      color => !players.some(player => player.color === color)
+    );
+    const newColor = availableColors[0] || playerColors[players.length % playerColors.length];
+    
+    setPlayers([
+      ...players,
+      { id: newPlayerId, name: `Player ${players.length + 1}`, score: 0, color: newColor }
+    ]);
+    
+    toast.info("New player added!");
+  };
+  
+  // Remove a player from the game
+  const removePlayer = (playerId) => {
+    if (players.length <= 2) {
+      toast.warning("Minimum 2 players required");
+      return;
+    }
+    
+    // Find player index
+    const playerIndex = players.findIndex(player => player.id === playerId);
+    if (playerIndex === -1) return;
+    
+    // Remove player
+    const updatedPlayers = [...players];
+    updatedPlayers.splice(playerIndex, 1);
+    
+    // Update player IDs to maintain sequence
+    const reindexedPlayers = updatedPlayers.map((player, index) => ({
+      ...player, id: `player${index + 1}`
+    }));
+    setPlayers(reindexedPlayers);
+  };
   
   // Logic to check if a line between two dots exists
   const lineExists = (row1, col1, row2, col2) => {
@@ -111,13 +161,17 @@ function MainFeature() {
         
         if (lineExists(row1-1, col1, row1-1, col2) && 
             lineExists(row1-1, col1, row1, col1) && 
-            lineExists(row1-1, col2, row1, col2)) {
-          const boxKey = `${row1-1},${col1}-${row1},${col2}`;
-          if (!boxes[boxKey]) {
-            setBoxes(prev => ({ ...prev, [boxKey]: currentPlayer }));
-            setPlayerInfo(prev => ({
-              ...prev,
-              [currentPlayer]: {
+            // Update boxes with the current player's ID
+            setBoxes(prev => ({ 
+              ...prev, 
+              [boxKey]: currentPlayer 
+            }));
+            
+            // Update the current player's score
+            setPlayers(prev => prev.map(player => {
+              if (player.id === currentPlayer)
+                return { ...player, score: player.score + 1 };
+              return player;
                 ...prev[currentPlayer],
                 score: prev[currentPlayer].score + 1
               }
@@ -140,13 +194,17 @@ function MainFeature() {
             lineExists(row1, col2, row1+1, col2)) {
           const boxKey = `${row1},${col1}-${row1+1},${col2}`;
           if (!boxes[boxKey]) {
-            setBoxes(prev => ({ ...prev, [boxKey]: currentPlayer }));
-            setPlayerInfo(prev => ({
-              ...prev,
-              [currentPlayer]: {
-                ...prev[currentPlayer],
-                score: prev[currentPlayer].score + 1
-              }
+            // Update boxes with the current player's ID
+            setBoxes(prev => ({ 
+              ...prev, 
+              [boxKey]: currentPlayer 
+            }));
+            
+            // Update the current player's score
+            setPlayers(prev => prev.map(player => {
+              if (player.id === currentPlayer)
+                return { ...player, score: player.score + 1 };
+              return player;
             }));
             boxesCompleted++;
           }
@@ -169,13 +227,17 @@ function MainFeature() {
             lineExists(row2, col1-1, row2, col1)) {
           const boxKey = `${row1},${col1-1}-${row2},${col1}`;
           if (!boxes[boxKey]) {
-            setBoxes(prev => ({ ...prev, [boxKey]: currentPlayer }));
-            setPlayerInfo(prev => ({
-              ...prev,
-              [currentPlayer]: {
-                ...prev[currentPlayer],
-                score: prev[currentPlayer].score + 1
-              }
+            // Update boxes with the current player's ID
+            setBoxes(prev => ({ 
+              ...prev, 
+              [boxKey]: currentPlayer 
+            }));
+            
+            // Update the current player's score
+            setPlayers(prev => prev.map(player => {
+              if (player.id === currentPlayer)
+                return { ...player, score: player.score + 1 };
+              return player;
             }));
             boxesCompleted++;
           }
@@ -195,13 +257,17 @@ function MainFeature() {
             lineExists(row2, col2, row2, col1+1)) {
           const boxKey = `${row1},${col1}-${row2},${col1+1}`;
           if (!boxes[boxKey]) {
-            setBoxes(prev => ({ ...prev, [boxKey]: currentPlayer }));
-            setPlayerInfo(prev => ({
-              ...prev,
-              [currentPlayer]: {
-                ...prev[currentPlayer],
-                score: prev[currentPlayer].score + 1
-              }
+            // Update boxes with the current player's ID
+            setBoxes(prev => ({ 
+              ...prev, 
+              [boxKey]: currentPlayer 
+            }));
+            
+            // Update the current player's score
+            setPlayers(prev => prev.map(player => {
+              if (player.id === currentPlayer)
+                return { ...player, score: player.score + 1 };
+              return player;
             }));
             boxesCompleted++;
           }
@@ -233,9 +299,18 @@ function MainFeature() {
     
     // Change turn if no boxes were completed
     if (boxesCompleted === 0) {
-      const nextPlayer = currentPlayer === 'player1' ? 'player2' : 'player1';
-      setCurrentPlayer(nextPlayer);
-      toast.info(`${playerInfo[nextPlayer].name}'s turn`, {
+      // Find current player index
+      const currentPlayerIndex = players.findIndex(player => player.id === currentPlayer);
+      if (currentPlayerIndex === -1) return;
+      
+      // Move to next player (loop back to first player if at the end)
+      const nextPlayerIndex = (currentPlayerIndex + 1) % players.length;
+      const nextPlayer = players[nextPlayerIndex].id;
+      
+      
+      // Get player name from the players array
+      const nextPlayerName = players[nextPlayerIndex].name;
+      toast.info(`${nextPlayerName}'s turn`, { autoClose: 1500 });
         autoClose: 1500
       });
     } else {
@@ -248,11 +323,18 @@ function MainFeature() {
       const filledBoxes = Object.keys(boxes).length + boxesCompleted;
       
       if (filledBoxes >= totalBoxes) {
-        const winner = playerInfo.player1.score > playerInfo.player2.score 
-          ? playerInfo.player1.name 
-          : playerInfo.player2.score > playerInfo.player1.score 
-            ? playerInfo.player2.name 
-            : 'It\'s a tie';
+        // Find player with the highest score
+        const highestScore = Math.max(...players.map(player => player.score));
+        const winners = players.filter(player => player.score === highestScore);
+        
+        let winnerMessage;
+        if (winners.length > 1) {
+          // Multiple winners - it's a tie
+          const winnerNames = winners.map(player => player.name).join(' and ');
+          winnerMessage = `It's a tie between ${winnerNames}!`;
+        } else {
+          winnerMessage = `${winners[0].name} wins!`;
+        }
             
         toast.success(`Game Over! ${winner === 'It\'s a tie' ? winner : `${winner} wins!`}`, {
           icon: "🏆",
@@ -293,7 +375,10 @@ function MainFeature() {
     for (let row = 0; row < gridSize; row++) {
       for (let col = 0; col < gridSize - 1; col++) {
         const lineKey = `${row},${col}-${row},${col+1}`;
-        const lineClassBase = lines[lineKey] ? `line-${lines[lineKey]}` : 'bg-surface-300 dark:bg-surface-600 hover:bg-surface-400 dark:hover:bg-surface-500';
+        // Find the player who owns this line
+        const lineOwner = lines[lineKey];
+        const playerColor = lineOwner ? players.find(p => p.id === lineOwner)?.color : null;
+        const lineClassBase = playerColor ? `bg-${playerColor}` : 'bg-surface-300 dark:bg-surface-600 hover:bg-surface-400 dark:hover:bg-surface-500';
         
         gridItems.push(
           <div 
@@ -315,7 +400,10 @@ function MainFeature() {
     for (let row = 0; row < gridSize - 1; row++) {
       for (let col = 0; col < gridSize; col++) {
         const lineKey = `${row},${col}-${row+1},${col}`;
-        const lineClassBase = lines[lineKey] ? `line-${lines[lineKey]}` : 'bg-surface-300 dark:bg-surface-600 hover:bg-surface-400 dark:hover:bg-surface-500';
+        // Find the player who owns this line
+        const lineOwner = lines[lineKey];
+        const playerColor = lineOwner ? players.find(p => p.id === lineOwner)?.color : null;
+        const lineClassBase = playerColor ? `bg-${playerColor}` : 'bg-surface-300 dark:bg-surface-600 hover:bg-surface-400 dark:hover:bg-surface-500';
         
         gridItems.push(
           <div 
@@ -419,59 +507,47 @@ function MainFeature() {
             exit={{ opacity: 0 }}
             className="bg-surface-100/50 dark:bg-surface-800/50 rounded-xl p-6 mb-4"
           >
-            <div className="flex flex-col md:flex-row gap-6">
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-primary dark:text-primary-light">
-                  <UserIcon size={20} />
-                  <span>Player 1</span>
-                </h3>
-                
-                <div className="flex items-center gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={playerInfo.player1.name}
-                    onChange={(e) => setPlayerInfo({
-                      ...playerInfo, 
-                      player1: {...playerInfo.player1, name: e.target.value}
-                    })}
-                    placeholder="Enter name"
-                    className="input"
-                  />
-                </div>
-                
-                <div className="flex items-center gap-4 mb-2">
-                  <span className="text-surface-600 dark:text-surface-400">Color:</span>
-                  <div className="w-6 h-6 rounded-full bg-primary" />
-                </div>
-              </div>
-              
-              <div className="hidden md:block w-px bg-surface-200 dark:bg-surface-700 mx-2"></div>
-              
-              <div className="flex-1">
-                <h3 className="text-lg font-semibold mb-4 flex items-center gap-2 text-secondary dark:text-secondary-light">
-                  <UserPlusIcon size={20} />
-                  <span>Player 2</span>
-                </h3>
-                
-                <div className="flex items-center gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={playerInfo.player2.name}
-                    onChange={(e) => setPlayerInfo({
-                      ...playerInfo, 
-                      player2: {...playerInfo.player2, name: e.target.value}
-                    })}
-                    placeholder="Enter name"
-                    className="input"
-                  />
-                </div>
-                
-                <div className="flex items-center gap-4 mb-2">
-                  <span className="text-surface-600 dark:text-surface-400">Color:</span>
-                  <div className="w-6 h-6 rounded-full bg-secondary" />
-                </div>
-              </div>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold">Player Setup</h3>
+              <button 
+                onClick={addNewPlayer}
+                className="btn-outline-secondary flex items-center gap-2 text-sm"
+                disabled={players.length >= 8}
+              >
+                <UserPlusIcon size={16} />
+                <span>Add Player</span>
+              </button>
             </div>
+            
+            <LayoutGroup>
+              <div className="space-y-4">
+                {players.map((player, index) => (
+                  <motion.div 
+                    key={player.id}
+                    layout
+                    className="flex items-center gap-3 p-3 rounded-lg bg-surface-200/50 dark:bg-surface-700/50"
+                  >
+                    <div className={`w-6 h-6 rounded-full bg-${player.color}`} />
+                    
+                    <input
+                      type="text"
+                      value={player.name}
+                      onChange={(e) => {
+                        const updatedPlayers = [...players];
+                        updatedPlayers[index].name = e.target.value;
+                        setPlayers(updatedPlayers);
+                      }}
+                      placeholder="Enter name"
+                      className="input flex-1"
+                    />
+                    
+                    <button onClick={() => removePlayer(player.id)} className="text-red-500 hover:text-red-700 p-1" disabled={players.length <= 2}>
+                      <TrashIcon size={18} />
+                    </button>
+                  </motion.div>
+                ))}
+                </div>
+            </LayoutGroup>
           </motion.div>
         ) : (
           <motion.div
@@ -493,35 +569,38 @@ function MainFeature() {
             <div className="w-full md:w-1/3">
               <div className="bg-surface-100/50 dark:bg-surface-800/50 rounded-xl p-4 mb-4">
                 <h3 className="text-lg font-semibold mb-3">Current Turn</h3>
-                <div className={`p-3 rounded-lg mb-2 ${
-                  currentPlayer === 'player1' 
-                    ? 'bg-primary/20 border-l-4 border-primary' 
-                    : 'bg-secondary/20 border-l-4 border-secondary'
-                }`}>
-                  <span className="font-medium">
-                    {playerInfo[currentPlayer].name}
-                  </span>
-                </div>
+                {players.map(player => {
+                  if (player.id === currentPlayer) {
+                    return (
+                      <div 
+                        key={player.id}
+                        className={`p-3 rounded-lg mb-2 bg-${player.color}/20 border-l-4 border-${player.color}`}
+                      >
+                        <span className="font-medium">
+                          {player.name}
+                        </span>
+                      </div>
+                    );
+                  }
+                  return null;
+                })}
               </div>
               
               <div className="bg-surface-100/50 dark:bg-surface-800/50 rounded-xl p-4">
                 <h3 className="text-lg font-semibold mb-3">Score</h3>
                 
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-primary/10 dark:bg-primary/20">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-primary"></div>
-                      <span>{playerInfo.player1.name}</span>
-                    </div>
-                    <span className="text-xl font-bold">{playerInfo.player1.score}</span>
-                  </div>
-                  
-                  <div className="flex justify-between items-center p-2 rounded-lg bg-secondary/10 dark:bg-secondary/20">
-                    <div className="flex items-center gap-2">
-                      <div className="w-4 h-4 rounded-full bg-secondary"></div>
-                      <span>{playerInfo.player2.name}</span>
-                    </div>
-                    <span className="text-xl font-bold">{playerInfo.player2.score}</span>
+                  {players.map(player => (
+                    <div 
+                      key={player.id}
+                      className={`flex justify-between items-center p-2 rounded-lg bg-${player.color}/10 dark:bg-${player.color}/20`}
+                    >
+                      <div className="flex items-center gap-2">
+                        <div className={`w-4 h-4 rounded-full bg-${player.color}`}></div>
+                        <span>{player.name}</span>
+                      </div>
+                      <span className="text-xl font-bold">{player.score}</span>
+                  ))}
                   </div>
                 </div>
               </div>
