@@ -315,7 +315,6 @@ function MainFeature() {
       toast.info(`${nextPlayerName}'s turn`, { autoClose: 1500 });
     } else {
       toast.success(`${playerInfo[currentPlayer].name} completed ${boxesCompleted} box${boxesCompleted > 1 ? 'es' : ''}!`, {
-      // Find current player info
       const currentPlayerInfo = players.find(player => player.id === currentPlayer);
       toast.success(`${currentPlayerInfo.name} completed ${boxesCompleted} box${boxesCompleted > 1 ? 'es' : ''}!`, {
       });
