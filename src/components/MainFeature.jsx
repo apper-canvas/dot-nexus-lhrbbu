@@ -176,7 +176,6 @@ function MainFeature() {
                 return { ...player, score: player.score + 1 };
               return player;
             }));
-            }));
             boxesCompleted++;
           }
         }
