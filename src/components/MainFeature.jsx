@@ -588,7 +588,6 @@ function MainFeature() {
                 <h3 className="text-lg font-semibold mb-3">Score</h3>
                 
                 <div className="space-y-3">
-                  {players.map(player => (
                   {players.map(player => {
                     return (
                       <div 
@@ -600,9 +599,9 @@ function MainFeature() {
                           <span>{player.name}</span>
                         </div>
                         <span className="text-xl font-bold">{player.score}</span>
-                      <span className="text-xl font-bold">{player.score}</span>
+                      </div>
                     );
-                  </div>
+                  })}
                 </div>
               </div>
             </div>
