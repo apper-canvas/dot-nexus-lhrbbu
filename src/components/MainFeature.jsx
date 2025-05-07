@@ -376,7 +376,8 @@ function MainFeature() {
         // Find the player who owns this line
         const lineOwner = lines[lineKey];
         const playerColor = lineOwner ? players.find(p => p.id === lineOwner)?.color : null;
-        const lineClassBase = playerColor ? `bg-${playerColor}` : 'bg-surface-300 dark:bg-surface-600 hover:bg-surface-400 dark:hover:bg-surface-500';
+        const hoverClass = !lineOwner ? 'hover:bg-surface-400 dark:hover:bg-surface-500' : '';
+        const lineClassBase = playerColor ? `bg-${playerColor}` : `bg-surface-300 dark:bg-surface-600 ${hoverClass}`;
         
         gridItems.push(
           <div 
@@ -401,7 +402,8 @@ function MainFeature() {
         // Find the player who owns this line
         const lineOwner = lines[lineKey];
         const playerColor = lineOwner ? players.find(p => p.id === lineOwner)?.color : null;
-        const lineClassBase = playerColor ? `bg-${playerColor}` : 'bg-surface-300 dark:bg-surface-600 hover:bg-surface-400 dark:hover:bg-surface-500';
+        const hoverClass = !lineOwner ? 'hover:bg-surface-400 dark:hover:bg-surface-500' : '';
+        const lineClassBase = playerColor ? `bg-${playerColor}` : `bg-surface-300 dark:bg-surface-600 ${hoverClass}`;
         
         gridItems.push(
           <div 
