@@ -311,8 +311,6 @@ function MainFeature() {
       // Get player name from the players array
       const nextPlayerName = players[nextPlayerIndex].name;
       toast.info(`${nextPlayerName}'s turn`, { autoClose: 1500 });
-        autoClose: 1500
-      });
     } else {
       toast.success(`${playerInfo[currentPlayer].name} completed ${boxesCompleted} box${boxesCompleted > 1 ? 'es' : ''}!`, {
         autoClose: 1500
