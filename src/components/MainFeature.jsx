@@ -589,16 +589,19 @@ function MainFeature() {
                 
                 <div className="space-y-3">
                   {players.map(player => (
-                    <div 
-                      key={player.id}
-                      className={`flex justify-between items-center p-2 rounded-lg bg-${player.color}/10 dark:bg-${player.color}/20`}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className={`w-4 h-4 rounded-full bg-${player.color}`}></div>
-                        <span>{player.name}</span>
-                      </div>
+                  {players.map(player => {
+                    return (
+                      <div 
+                        key={player.id}
+                        className={`flex justify-between items-center p-2 rounded-lg bg-${player.color}/10 dark:bg-${player.color}/20`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className={`w-4 h-4 rounded-full bg-${player.color}`}></div>
+                          <span>{player.name}</span>
+                        </div>
+                        <span className="text-xl font-bold">{player.score}</span>
                       <span className="text-xl font-bold">{player.score}</span>
-                  ))}
+                    );
                   </div>
                 </div>
               </div>
